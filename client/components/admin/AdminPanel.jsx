@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi, setAdminToken } from '@/utils/adminApi';
+import { formatDateTime, formatDateKey } from '@/utils/formatDateTime';
 
 const TABS = [
   { id: 'dashboard', label: 'דשבורד', icon: '📊' },
@@ -232,6 +233,7 @@ export default function AdminPanel() {
           <Link href="/" className="block mt-2 text-accent hover:underline">
             צפה באתר
           </Link>
+          <p className="text-xs opacity-50 mt-4">© 2026 יעלי זורסקי</p>
         </div>
       </aside>
 
@@ -428,8 +430,8 @@ export default function AdminPanel() {
                       ))}
                     </select>
                   </div>
-                  <p className="text-xs text-gray-400">
-                    {new Date(o.createdAt).toLocaleString('he-IL')}
+                  <p className="text-xs text-gray-400" dir="ltr">
+                    {formatDateTime(o.createdAt).full}
                   </p>
                 </div>
               ))}
@@ -496,8 +498,8 @@ export default function AdminPanel() {
                 <h3 className="font-bold mb-4">הכנסות יומיות</h3>
                 <div className="space-y-2 text-sm">
                   {(dashboard?.dailyRevenue || []).slice(-14).map((d) => (
-                    <div key={d._id} className="flex justify-between">
-                      <span>{d._id}</span>
+                    <div key={d._id} className="flex justify-between gap-4">
+                      <span dir="ltr" className="tabular-nums">{formatDateKey(d._id)}</span>
                       <span>₪{d.revenue} ({d.orders} הזמנות)</span>
                     </div>
                   ))}
@@ -510,8 +512,8 @@ export default function AdminPanel() {
                 <h3 className="font-bold mb-4">צפיות יומיות</h3>
                 <div className="space-y-2 text-sm">
                   {(dashboard?.dailyViews || []).slice(-14).map((d) => (
-                    <div key={d._id} className="flex justify-between">
-                      <span>{d._id}</span>
+                    <div key={d._id} className="flex justify-between gap-4">
+                      <span dir="ltr" className="tabular-nums">{formatDateKey(d._id)}</span>
                       <span>{d.count} צפיות</span>
                     </div>
                   ))}
