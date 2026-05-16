@@ -64,10 +64,22 @@ npm run dev
 - ניהול מוצרים, הזמנות, אנליטיקס
 - A/B testing, Google Analytics, exit-intent
 
-## פריסה
+## פריסה ל-Vercel (Frontend)
 
-- **Frontend:** Vercel – שורש `client`
+האפליקציה נמצאת בתיקייה `client` – חובה להגדיר ב-Vercel:
+
+1. **Settings → General → Root Directory** → בחר `client` → Save  
+2. **Settings → Environment Variables** → הוסף:
+   - `NEXT_PUBLIC_API_URL` = כתובת ה-API בפרודקשן (למשל `https://your-app.onrender.com/api`)
+   - `NEXT_PUBLIC_GA_ID` = (אופציונלי)
+3. **Deployments** → Redeploy (עם commit אחרון מ-`main`)
+
+> אם ה-build נכשל אחרי "Installing dependencies" – כמעט תמיד Root Directory לא מוגדר ל-`client`.
+
+## פריסה (Backend)
+
 - **Backend:** Render / Railway – שורש `server`
+- אחרי פריסת השרת, עדכן ב-Vercel את `NEXT_PUBLIC_API_URL`
 
 ## צ'קליסט השקה
 
