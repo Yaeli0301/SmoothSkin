@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createCheckout, saveAbandonedCart } from '@/utils/api';
-import { trackAddToCart } from '@/utils/analytics';
+import { trackAddToCart, trackCheckoutStart } from '@/utils/analytics';
 
 export default function CheckoutModal({ product, price, abVariant, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -27,6 +27,7 @@ export default function CheckoutModal({ product, price, abVariant, onClose }) {
 
     try {
       await trackAddToCart(product._id, abVariant);
+      await trackCheckoutStart(product._id, abVariant);
       const { url } = await createCheckout({
         productId: product._id,
         quantity: 1,

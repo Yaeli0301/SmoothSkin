@@ -1,12 +1,15 @@
 import Product from '../models/Product.js';
+import { generateProductContent } from '../services/productGenerator.js';
 
 function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim() || `product-${Date.now()}`;
+  return (
+    text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim() || `product-${Date.now()}`
+  );
 }
 
 export async function listProducts(req, res) {
@@ -20,7 +23,22 @@ export async function listProducts(req, res) {
 
 export async function createProduct(req, res) {
   try {
-    const data = { ...req.body };
+    const autoGenerate = req.body.autoGenerate !== false;
+    let data = { ...req.body };
+    delete data.autoGenerate;
+
+    if (autoGenerate && !data.title) {
+      const generated = generateProductContent({
+        productName: data.productName || 'מוצר חדש',
+        category: data.category || 'skin-care',
+        productType: data.productType,
+        keyFeature: data.keyFeature,
+        targetBenefit: data.targetBenefit,
+        price: data.price,
+      });
+      data = { ...generated, ...data };
+    }
+
     if (!data.slug && data.title) data.slug = slugify(data.title);
     if (!data.slug) data.slug = `product-${Date.now()}`;
 
@@ -29,6 +47,15 @@ export async function createProduct(req, res) {
 
     const product = await Product.create(data);
     res.status(201).json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+export async function generatePreview(req, res) {
+  try {
+    const content = generateProductContent(req.body);
+    res.json(content);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -59,7 +86,11 @@ export async function deleteProduct(req, res) {
 
 export async function listActiveProducts(req, res) {
   try {
-    const products = await Product.find({ active: true }).select('slug title price images stock').sort({ createdAt: -1 });
+    const filter = { active: true };
+    if (req.query.category) filter.category = req.query.category;
+    const products = await Product.find(filter)
+      .select('slug title price compareAtPrice images stock category shortDescription')
+      .sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });

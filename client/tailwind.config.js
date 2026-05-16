@@ -8,19 +8,22 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#FF4D6D',
+        primary: '#E91E63',
         secondary: '#111111',
-        accent: '#FFD6DD',
+        accent: '#F8E1E7',
+        surface: '#FAFAFA',
       },
       borderRadius: {
-        card: '16px',
+        card: '20px',
+        pill: '24px',
       },
       boxShadow: {
-        soft: '0 4px 24px rgba(0, 0, 0, 0.08)',
-        cta: '0 8px 32px rgba(255, 77, 109, 0.35)',
+        soft: '0 4px 24px rgba(17, 17, 17, 0.06)',
+        card: '0 8px 32px rgba(233, 30, 99, 0.08)',
       },
       fontFamily: {
-        sans: ['Heebo', 'Arial', 'sans-serif'],
+        sans: ['Heebo', 'system-ui', 'sans-serif'],
+        display: ['Heebo', 'system-ui', 'sans-serif'],
       },
     },
   },

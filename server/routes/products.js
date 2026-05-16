@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { getProduct } from '../controllers/productController.js';
-import { listActiveProducts } from '../controllers/adminProductController.js';
+import { getProduct, listProducts } from '../controllers/productController.js';
 
 const router = Router();
 
-router.get('/', listActiveProducts);
+router.get('/', listProducts);
 router.get('/:slug', getProduct);
 
 export default router;

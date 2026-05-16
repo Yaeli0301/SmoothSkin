@@ -10,6 +10,8 @@ import orderRoutes from './routes/orders.js';
 import analyticsRoutes from './routes/analytics.js';
 import cartRoutes from './routes/cart.js';
 import adminRoutes from './routes/admin.js';
+import collectionRoutes from './routes/collections.js';
+import storeRoutes from './routes/store.js';
 import { handleWebhook } from './controllers/orderController.js';
 import { processAbandonedCarts } from './controllers/cartController.js';
 
@@ -34,6 +36,8 @@ app.use('/api/', limiter);
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
 
 app.use('/api/products', productRoutes);
+app.use('/api/collections', collectionRoutes);
+app.use('/api/store', storeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/cart', cartRoutes);

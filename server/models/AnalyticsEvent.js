@@ -4,7 +4,15 @@ const analyticsEventSchema = new mongoose.Schema(
   {
     event: {
       type: String,
-      enum: ['page_view', 'add_to_cart', 'purchase', 'exit_intent', 'ab_exposure'],
+      enum: [
+        'page_view',
+        'add_to_cart',
+        'checkout_start',
+        'purchase',
+        'exit_intent',
+        'ab_exposure',
+        'product_click',
+      ],
       required: true,
     },
     page: String,

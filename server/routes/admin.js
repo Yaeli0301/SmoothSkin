@@ -6,7 +6,10 @@ import {
   createProduct,
   updateProductById,
   deleteProduct,
+  generatePreview,
 } from '../controllers/adminProductController.js';
+import { updateStoreSettings } from '../controllers/storeController.js';
+import StoreSettings from '../models/StoreSettings.js';
 import {
   getPaymentSettingsHandler,
   updatePaymentSettings,
@@ -32,8 +35,20 @@ router.get('/dashboard', getFullDashboard);
 
 router.get('/products', listProducts);
 router.post('/products', createProduct);
+router.post('/products/generate-preview', generatePreview);
 router.put('/products/:id', updateProductById);
 router.delete('/products/:id', deleteProduct);
+
+router.get('/store-settings', async (req, res) => {
+  try {
+    let s = await StoreSettings.findOne({ key: 'store' });
+    if (!s) s = await StoreSettings.create({ key: 'store' });
+    res.json(s);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+router.put('/store-settings', updateStoreSettings);
 
 router.get('/settings/payment', getPaymentSettingsHandler);
 router.put('/settings/payment', updatePaymentSettings);

@@ -12,9 +12,19 @@ const TABS = [
   { id: 'orders', label: 'הזמנות', icon: '🛒' },
   { id: 'payments', label: 'תשלומים', icon: '💳' },
   { id: 'analytics', label: 'אנליטיקס', icon: '📈' },
+  { id: 'store', label: 'חנות', icon: '🏪' },
+];
+
+const CATEGORIES = [
+  { value: 'skin-care', label: 'טיפוח עור' },
+  { value: 'hair-removal', label: 'הסרת שיער' },
+  { value: 'oral-care', label: 'טיפוח פה' },
+  { value: 'tools', label: 'כלי יופי' },
 ];
 
 const EMPTY_PRODUCT = {
+  productName: '',
+  category: 'skin-care',
   title: '',
   slug: '',
   headline: '',
@@ -24,7 +34,9 @@ const EMPTY_PRODUCT = {
   stock: 50,
   images: '',
   bullets: '',
+  howItWorks: '',
   active: true,
+  autoGenerate: true,
 };
 
 const ORDER_STATUSES = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
@@ -61,6 +73,11 @@ export default function AdminPanel() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const [paymentForm, setPaymentForm] = useState({});
+  const [storeForm, setStoreForm] = useState({
+    storeName: 'Glow Routine',
+    freeShippingBanner: { enabled: true, text: '' },
+    discountBanner: { enabled: false, text: '' },
+  });
 
   const showMsg = (text) => {
     setMsg(text);
@@ -75,12 +92,13 @@ export default function AdminPanel() {
   const loadAll = useCallback(async () => {
     setError('');
     try {
-      const [me, dash, prods, ords, pay] = await Promise.all([
+      const [me, dash, prods, ords, pay, store] = await Promise.all([
         adminApi.me(),
         adminApi.dashboard(30),
         adminApi.getProducts(),
         adminApi.getOrders(),
         adminApi.getPaymentSettings(),
+        adminApi.getStoreSettings(),
       ]);
       setAdmin(me.admin);
       setDashboard(dash);
@@ -98,6 +116,13 @@ export default function AdminPanel() {
         payoutNotes: pay.payoutNotes || '',
         storeName: pay.storeName || '',
       });
+      if (store) {
+        setStoreForm({
+          storeName: store.storeName || 'Glow Routine',
+          freeShippingBanner: store.freeShippingBanner || { enabled: true, text: '' },
+          discountBanner: store.discountBanner || { enabled: false, text: '' },
+        });
+      }
     } catch (err) {
       if (err.message.includes('התחברות') || err.message.includes('טוקן')) {
         router.push('/admin/login');
@@ -123,7 +148,11 @@ export default function AdminPanel() {
     stock: p.stock ?? 50,
     images: (p.images || []).join('\n'),
     bullets: (p.bullets || []).join('\n'),
+    howItWorks: (p.howItWorks || []).join('\n'),
+    category: p.category || 'skin-care',
+    productName: p.title,
     active: p.active !== false,
+    autoGenerate: false,
   });
 
   const formToProduct = (f) => ({
@@ -136,7 +165,11 @@ export default function AdminPanel() {
     stock: Number(f.stock),
     images: f.images.split('\n').map((s) => s.trim()).filter(Boolean),
     bullets: f.bullets.split('\n').map((s) => s.trim()).filter(Boolean),
+    howItWorks: f.howItWorks.split('\n').map((s) => s.trim()).filter(Boolean),
+    category: f.category,
     active: f.active,
+    autoGenerate: f.autoGenerate,
+    productName: f.productName || f.title,
   });
 
   const saveProduct = async (e) => {
@@ -292,6 +325,40 @@ export default function AdminPanel() {
                 {editing ? 'עריכת מוצר' : 'מוצר חדש'}
               </h2>
               <form onSubmit={saveProduct} className="card space-y-3">
+                {!editing && (
+                  <>
+                    <input
+                      className="w-full border rounded-lg px-3 py-2"
+                      placeholder="שם מוצר ליצירה אוטומטית"
+                      value={form.productName}
+                      onChange={(e) => setForm({ ...form, productName: e.target.value })}
+                    />
+                    <select
+                      className="w-full border rounded-lg px-3 py-2"
+                      value={form.category}
+                      onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    >
+                      {CATEGORIES.map((c) => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className="btn-outline w-full min-h-0 py-2 text-sm"
+                      onClick={async () => {
+                        const preview = await adminApi.generatePreview({
+                          productName: form.productName || 'מוצר חדש',
+                          category: form.category,
+                          price: form.price,
+                        });
+                        setForm({ ...form, ...productToForm(preview), autoGenerate: true });
+                        showMsg('תוכן נוצר – ערכי ושמרי');
+                      }}
+                    >
+                      ✨ צור תוכן אוטומטי (AI)
+                    </button>
+                  </>
+                )}
                 {['title', 'slug', 'headline', 'price', 'compareAtPrice', 'stock'].map((field) => (
                   <div key={field}>
                     <label className="text-sm font-medium">{field}</label>
@@ -330,6 +397,26 @@ export default function AdminPanel() {
                     onChange={(e) => setForm({ ...form, bullets: e.target.value })}
                   />
                 </div>
+                <div>
+                  <label className="text-sm font-medium">איך זה עובד (שורה לשלב)</label>
+                  <textarea
+                    className="w-full border rounded-lg px-3 py-2 mt-1"
+                    rows={3}
+                    value={form.howItWorks}
+                    onChange={(e) => setForm({ ...form, howItWorks: e.target.value })}
+                  />
+                </div>
+                {editing && (
+                  <select
+                    className="w-full border rounded-lg px-3 py-2"
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                  </select>
+                )}
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -372,7 +459,7 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex gap-2">
                         <Link
-                          href={`/product/${p.slug}`}
+                          href={`/products/${p.slug}`}
                           target="_blank"
                           className="text-sm text-primary"
                         >

@@ -1,13 +1,12 @@
 import HomePage from '@/components/HomePage';
-import { fetchProduct } from '@/utils/api';
-import { FALLBACK_PRODUCT } from '@/utils/fallbackProduct';
+import { fetchProducts, fetchStoreSettings } from '@/utils/api';
 
 export default async function Page() {
-  let product = FALLBACK_PRODUCT;
+  let products = [];
   try {
-    product = await fetchProduct();
+    products = await fetchProducts();
   } catch {
-    /* use fallback when API unavailable */
+    /* fallback empty */
   }
-  return <HomePage product={product} />;
+  return <HomePage products={products} />;
 }

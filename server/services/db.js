@@ -2,32 +2,39 @@ import mongoose from 'mongoose';
 import Admin from '../models/Admin.js';
 import Product from '../models/Product.js';
 import Settings from '../models/Settings.js';
+import StoreSettings from '../models/StoreSettings.js';
+import { generateProductContent } from './productGenerator.js';
 
-const DEFAULT_PRODUCT = {
-  slug: 'hair-remover',
-  title: 'מכשיר הסרת שיער פנים – ללא כאב',
-  headline: 'פתרון מהיר להסרת שיער פנים – בלי כאב',
-  description: 'מכשיר חדשני להסרת שיער פנים תוך שניות.',
-  bullets: ['מתאים לכל סוגי העור', 'שימוש תוך שניות', 'ללא אדמומיות'],
-  price: 149,
-  compareAtPrice: 299,
-  stock: 23,
-  images: [
-    'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800&q=80',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80',
-  ],
-  benefits: [
-    { icon: 'heart', label: 'ללא כאב' },
-    { icon: 'mobile', label: 'נייד' },
-    { icon: 'zap', label: 'מהיר' },
-    { icon: 'shield', label: 'בטוח לעור' },
-  ],
-  reviews: [
-    { name: 'שירה כ.', rating: 5, text: 'מדהים! ממליצה בחום!' },
-    { name: 'מיכל ר.', rating: 5, text: 'סוף סוף בלי כאב.' },
-  ],
-  active: true,
-};
+const SEED_PRODUCTS = [
+  {
+    slug: 'hair-remover',
+    productName: 'מכשיר הסרת שיער עדין',
+    category: 'hair-removal',
+    price: 149,
+    stock: 18,
+  },
+  {
+    slug: 'facial-cleanser',
+    productName: 'סרום הזנה לפנים',
+    category: 'skin-care',
+    price: 89,
+    stock: 40,
+  },
+  {
+    slug: 'sonic-brush',
+    productName: 'מברשת שיניים סונית',
+    category: 'oral-care',
+    price: 119,
+    stock: 35,
+  },
+  {
+    slug: 'gua-sha-tool',
+    productName: 'כלי גוואשה לעיסוי פנים',
+    category: 'tools',
+    price: 69,
+    stock: 50,
+  },
+];
 
 export async function connectDatabase() {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dropship';
@@ -36,7 +43,7 @@ export async function connectDatabase() {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 4000 });
     console.log('MongoDB connected');
     return;
-  } catch (err) {
+  } catch {
     console.warn('Local MongoDB unavailable, starting in-memory database...');
   }
 
@@ -50,20 +57,34 @@ export async function ensureSeedData() {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@store.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
-  const adminCount = await Admin.countDocuments();
-  if (adminCount === 0) {
+  if ((await Admin.countDocuments()) === 0) {
     await Admin.create({ email: adminEmail, password: adminPassword, name: 'מנהל ראשי' });
     console.log(`Admin seeded: ${adminEmail} / ${adminPassword}`);
   }
 
-  await Product.findOneAndUpdate({ slug: DEFAULT_PRODUCT.slug }, DEFAULT_PRODUCT, {
-    upsert: true,
-    new: true,
-  });
+  for (const seed of SEED_PRODUCTS) {
+    const generated = generateProductContent(seed);
+    await Product.findOneAndUpdate(
+      { slug: seed.slug },
+      { ...generated, slug: seed.slug, stock: seed.stock, active: true },
+      { upsert: true, new: true }
+    );
+  }
 
   await Settings.findOneAndUpdate(
     { key: 'payment' },
-    { key: 'payment', payoutEmail: adminEmail, storeName: 'SmoothSkin', currency: 'ils' },
+    { key: 'payment', payoutEmail: adminEmail, storeName: 'Glow Routine', currency: 'ils' },
+    { upsert: true }
+  );
+
+  await StoreSettings.findOneAndUpdate(
+    { key: 'store' },
+    {
+      key: 'store',
+      storeName: 'Glow Routine',
+      freeShippingBanner: { enabled: true, text: 'משלוח חינם על הזמנות מעל ₪149' },
+      discountBanner: { enabled: false, text: '' },
+    },
     { upsert: true }
   );
 }

@@ -7,7 +7,17 @@ const router = Router();
 
 router.post(
   '/track',
-  [body('event').isIn(['page_view', 'add_to_cart', 'purchase', 'exit_intent', 'ab_exposure'])],
+  [
+    body('event').isIn([
+      'page_view',
+      'add_to_cart',
+      'checkout_start',
+      'purchase',
+      'exit_intent',
+      'ab_exposure',
+      'product_click',
+    ]),
+  ],
   handleValidation,
   trackEvent
 );

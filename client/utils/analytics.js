@@ -18,32 +18,32 @@ export function gtag(...args) {
   }
 }
 
-export async function trackPageView(page, abVariant) {
+async function send(event, payload = {}) {
   const sessionId = getSessionId();
-  gtag('event', 'page_view', { page_path: page, ab_variant: abVariant });
-  await trackEvent({ event: 'page_view', page, sessionId, abVariant });
+  gtag('event', event, payload);
+  await trackEvent({ event, sessionId, ...payload });
+}
+
+export async function trackPageView(page, abVariant) {
+  await send('page_view', { page, abVariant });
+}
+
+export async function trackProductClick(productId, slug) {
+  await send('product_click', { productId, page: `/products/${slug}`, metadata: { slug } });
 }
 
 export async function trackAddToCart(productId, abVariant) {
-  const sessionId = getSessionId();
-  gtag('event', 'add_to_cart', { items: [{ id: productId }] });
-  await trackEvent({ event: 'add_to_cart', productId, sessionId, abVariant });
+  await send('add_to_cart', { productId, abVariant });
+}
+
+export async function trackCheckoutStart(productId, abVariant) {
+  await send('checkout_start', { productId, abVariant });
 }
 
 export async function trackPurchase(productId, abVariant, amount) {
-  const sessionId = getSessionId();
-  gtag('event', 'purchase', { value: amount, currency: 'ILS' });
-  await trackEvent({
-    event: 'purchase',
-    productId,
-    sessionId,
-    abVariant,
-    metadata: { amount },
-  });
+  await send('purchase', { productId, abVariant, metadata: { amount } });
 }
 
 export async function trackExitIntent(page, abVariant) {
-  const sessionId = getSessionId();
-  gtag('event', 'exit_intent', { page_path: page });
-  await trackEvent({ event: 'exit_intent', page, sessionId, abVariant });
+  await send('exit_intent', { page, abVariant });
 }

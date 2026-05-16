@@ -46,4 +46,11 @@ export const adminApi = {
   getOrders: () => adminFetch('/orders'),
   updateOrderStatus: (id, status) =>
     adminFetch(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+
+  generatePreview: (body) =>
+    adminFetch('/products/generate-preview', { method: 'POST', body: JSON.stringify(body) }),
+
+  getStoreSettings: () => adminFetch('/store-settings'),
+  updateStoreSettings: (body) =>
+    adminFetch('/store-settings', { method: 'PUT', body: JSON.stringify(body) }),
 };

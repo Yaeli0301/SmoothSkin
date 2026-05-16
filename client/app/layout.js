@@ -3,8 +3,8 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import StoreShell from '@/components/StoreShell';
 
 export const metadata = {
-  title: 'SmoothSkin – הסרת שיער ללא כאב',
-  description: 'מכשיר הסרת שיער פנים – עור חלק תוך שניות, בלי כאב ובלי מאמץ',
+  title: 'Glow Routine – טיפוח ביתי חכם',
+  description: 'מוצרי יופי וטיפוח עצמי – שגרה פשוטה, תוצאות עקביות, תחושה טובה.',
 };
 
 export default function RootLayout({ children }) {
