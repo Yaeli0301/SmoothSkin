@@ -1,6 +1,6 @@
-# חנות דרופשיפינג – SmoothSkin
+# SmoothSkin – חנות דרופשיפינג
 
-חנות איקומרס חד-מוצרית בעברית (RTL) עם אופטימיזציה להמרות, Stripe, אנליטיקס ו-A/B testing.
+חנות איקומרס בעברית (RTL) עם אופטימיזציה להמרות, Stripe, אנליטיקס, A/B testing ופאנל מנהל.
 
 ## מבנה הפרויקט
 
@@ -25,7 +25,8 @@ npm run install:all
 - `STRIPE_SECRET_KEY` – מפתח Stripe
 - `STRIPE_WEBHOOK_SECRET` – webhook לתשלומים
 - `CLIENT_URL=http://localhost:3000`
-- `ADMIN_API_KEY` – לדשבורד `/admin`
+- `JWT_SECRET` – לאימות מנהל
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` – משתמש מנהל ראשוני
 
 **client/.env.local** (העתק מ-`client/.env.local.example`):
 
@@ -33,58 +34,44 @@ npm run install:all
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_GA_ID` – Google Analytics (אופציונלי)
 
-### 3. MongoDB + seed
-
-```bash
-npm run seed
-```
-
-### 4. הרצה
+### 3. הרצה
 
 ```bash
 npm run dev
 ```
 
-- Frontend: http://localhost:3000
-- API: http://localhost:5000
-- Admin: http://localhost:3000/admin
+- **חנות:** http://localhost:3000
+- **API:** http://localhost:5000
+- **פאנל מנהל:** http://localhost:3000/admin/login
 
-## Stripe Webhook (פרודקשן)
-
-```bash
-stripe listen --forward-to localhost:5000/api/orders/webhook
-```
+ברירת מחדל: `admin@store.com` / `admin123`
 
 ## דפים
 
 | דף | נתיב |
 |----|------|
-| דף בית (המרות) | `/` |
-| דף מוצר + תשלום | `/product` |
+| דף בית | `/` |
+| דף מוצר | `/product` או `/product/[slug]` |
 | אחרי רכישה | `/success` |
-| דשבורד | `/admin` |
+| כניסת מנהל | `/admin/login` |
+| פאנל מנהל | `/admin` |
 
 ## תכונות
 
-- ✅ עיצוב RTL בעברית, צבעי המרה (#FF4D6D)
-- ✅ דף בית: Hero, הוכחה חברתית, בעיה/פתרון, יתרונות, לפני/אחרי
-- ✅ דף מוצר: גלריה, מחיר מוזל, countdown, מלאי מוגבל
-- ✅ CTA דביק במובייל, exit-intent popup
-- ✅ A/B testing (כותרת, מחיר, צבע CTA) ב-localStorage
-- ✅ Google Analytics + אירועים מותאמים לשרת
-- ✅ Stripe Checkout
-- ✅ אימייל אישור הזמנה + נטישת עגלה (SMTP)
-- ✅ דשבורד הכנסות והמרות
+- עיצוב RTL בעברית, צבעי המרה (#FF4D6D)
+- דף בית ודף מוצר מותאמים להמרות
+- Stripe Checkout + הגדרות תשלום בפאנל מנהל
+- ניהול מוצרים, הזמנות, אנליטיקס
+- A/B testing, Google Analytics, exit-intent
 
 ## פריסה
 
 - **Frontend:** Vercel – שורש `client`
-- **Backend:** Render/Railway – שורש `server`
+- **Backend:** Render / Railway – שורש `server`
 
 ## צ'קליסט השקה
 
 - [ ] מפתחות Stripe (test → live)
 - [ ] MongoDB Atlas
 - [ ] GA מחובר
-- [ ] 3–5 סרטוני TikTok מוכנים
-- [ ] בדיקת תשלום מלאה במובייל
+- [ ] בדיקת תשלום במובייל
