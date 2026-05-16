@@ -577,6 +577,81 @@ export default function AdminPanel() {
           </div>
         )}
 
+        {tab === 'store' && (
+          <div className="max-w-xl">
+            <h2 className="text-2xl font-bold mb-6">הגדרות חנות ובאנרים</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                await adminApi.updateStoreSettings(storeForm);
+                showMsg('הגדרות חנות נשמרו');
+              }}
+              className="card space-y-4"
+            >
+              <div>
+                <label className="text-sm font-medium">שם החנות</label>
+                <input
+                  className="w-full border rounded-lg px-3 py-2 mt-1"
+                  value={storeForm.storeName}
+                  onChange={(e) => setStoreForm({ ...storeForm, storeName: e.target.value })}
+                />
+              </div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={storeForm.freeShippingBanner?.enabled}
+                  onChange={(e) =>
+                    setStoreForm({
+                      ...storeForm,
+                      freeShippingBanner: {
+                        ...storeForm.freeShippingBanner,
+                        enabled: e.target.checked,
+                      },
+                    })
+                  }
+                />
+                באנר משלוח חינם
+              </label>
+              <input
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="טקסט משלוח חינם"
+                value={storeForm.freeShippingBanner?.text || ''}
+                onChange={(e) =>
+                  setStoreForm({
+                    ...storeForm,
+                    freeShippingBanner: { ...storeForm.freeShippingBanner, text: e.target.value },
+                  })
+                }
+              />
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={storeForm.discountBanner?.enabled}
+                  onChange={(e) =>
+                    setStoreForm({
+                      ...storeForm,
+                      discountBanner: { ...storeForm.discountBanner, enabled: e.target.checked },
+                    })
+                  }
+                />
+                באנר הנחה
+              </label>
+              <input
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="טקסט הנחה"
+                value={storeForm.discountBanner?.text || ''}
+                onChange={(e) =>
+                  setStoreForm({
+                    ...storeForm,
+                    discountBanner: { ...storeForm.discountBanner, text: e.target.value },
+                  })
+                }
+              />
+              <button type="submit" className="btn-primary w-full min-h-0 py-3">שמור</button>
+            </form>
+          </div>
+        )}
+
         {tab === 'analytics' && (
           <div>
             <h2 className="text-2xl font-bold mb-6">אנליטיקס מפורט</h2>
