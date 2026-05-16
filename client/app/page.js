@@ -1,12 +1,7 @@
 import HomePage from '@/components/HomePage';
-import { fetchProducts, fetchStoreSettings } from '@/utils/api';
+import { getProducts } from '@/utils/catalog';
 
 export default async function Page() {
-  let products = [];
-  try {
-    products = await fetchProducts();
-  } catch {
-    /* fallback empty */
-  }
+  const products = await getProducts();
   return <HomePage products={products} />;
 }

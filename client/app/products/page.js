@@ -1,6 +1,5 @@
-import Link from 'next/link';
 import ProductCard from '@/components/store/ProductCard';
-import { fetchProducts } from '@/utils/api';
+import { getProducts } from '@/utils/catalog';
 
 export const metadata = {
   title: 'כל המוצרים | Glow Routine',
@@ -8,12 +7,7 @@ export const metadata = {
 };
 
 export default async function ProductsPage() {
-  let products = [];
-  try {
-    products = await fetchProducts();
-  } catch {
-    /* empty */
-  }
+  const products = await getProducts();
 
   return (
     <div className="pb-20">
@@ -29,9 +23,6 @@ export default async function ProductsPage() {
             <ProductCard key={p._id || p.slug} product={p} />
           ))}
         </div>
-        {products.length === 0 && (
-          <p className="text-center text-gray-500 py-16">אין מוצרים זמינים כרגע</p>
-        )}
       </section>
     </div>
   );

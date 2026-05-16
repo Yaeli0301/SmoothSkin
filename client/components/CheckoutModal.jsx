@@ -36,7 +36,10 @@ export default function CheckoutModal({ product, price, abVariant, onClose }) {
       });
       if (url) window.location.href = url;
     } catch (err) {
-      setError(err.message);
+      const msg = err.message?.includes('fetch') || err.message?.includes('Failed')
+        ? 'לא ניתן להתחבר לשרת התשלומים. ודאי שהשרת (API) פעיל והגדרת NEXT_PUBLIC_API_URL ב-Vercel.'
+        : err.message || 'שגיאה בתשלום – נסי שוב';
+      setError(msg);
       setLoading(false);
     }
   };
