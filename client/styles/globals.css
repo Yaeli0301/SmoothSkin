@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap');
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-secondary antialiased;
+  font-size: 17px;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-bold py-4 px-8 rounded-card shadow-cta
+           hover:opacity-90 active:scale-[0.98] transition-all text-lg
+           min-h-[56px] flex items-center justify-center;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white font-bold py-4 px-8 rounded-card
+           hover:opacity-90 transition-all text-lg min-h-[56px];
+  }
+
+  .section-padding {
+    @apply px-4 py-16 md:px-8 md:py-24 max-w-6xl mx-auto;
+  }
+
+  .card {
+    @apply bg-white rounded-card shadow-soft p-6;
+  }
+}
